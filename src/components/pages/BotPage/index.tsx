@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import tmi from 'tmi.js';
 
 const BotPage = () => {
     const [tmiClient, setTmiClient] = useState<tmi.Client | null>(null);
-    const userName = 'niv3k_el_pato';
+    const { userName } = useParams<{userName: string}>();
 
     useEffect(() => {
         if (tmiClient || !userName) return;
