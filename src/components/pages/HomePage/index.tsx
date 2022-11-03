@@ -38,7 +38,7 @@ const HomePage = () => {
 
             <div>
                 <div>
-                    <ClickToCopy content={`https://bot.niv3k_el_pato.com/${userName}`} />
+                    <ClickToCopy content={`https://bot.niv3kelpato.com/${userName}`} />
                     <Typography variant="action"></Typography>
                 </div>
                 <div>
