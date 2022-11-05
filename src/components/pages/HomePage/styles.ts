@@ -26,4 +26,12 @@ export const Card = Styled.div`
     > *:not(:first-child) {
         margin: 2em 0;
     }
+    @media (max-width:515px) or (max-height: 500px) {
+        max-height: 90%;
+        max-width: 90%;
+        overflow: auto;
+        padding: 10px;
+        font-size: 0.7rem;
+        margin: 5px;
+    }
 `;

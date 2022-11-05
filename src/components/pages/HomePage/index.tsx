@@ -14,7 +14,7 @@ const HomePage = () => {
             <div>
                 <div>
                     <Typography variant="body">
-                        Sube el nivel de tu stream con el pato que hace
+                        Sube el nivel de tu stream con el pato que hace&nbsp;
                     </Typography>
                     <Typography variant="body" color="orange">
                         *quack*
@@ -22,7 +22,7 @@ const HomePage = () => {
                 </div>
                 <div>
                     <Typography variant="body">
-                        con el commando
+                        con el commando&nbsp;
                     </Typography>       
                     <Typography variant="body" color="orange">
                         *quack*
@@ -39,7 +39,6 @@ const HomePage = () => {
             <div>
                 <div>
                     <ClickToCopy content={`${window.location.origin}/${userName}`} />
-                    <Typography variant="action"></Typography>
                 </div>
                 <div>
                     <Typography variant="description">
