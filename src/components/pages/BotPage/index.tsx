@@ -21,17 +21,14 @@ const BotPage = () => {
         client.connect().catch(console.error);
         client.on('message', (channel, tags, message, self) => {
             if (message === '*quack*'){
-                console.log('RECEIVED QUACK');
                 var audio = new Audio('/audio/quack-1.wav');
                 audio.loop = false;
                 audio.play(); 
             }
         });
         setTmiClient(client);
-        console.log('called create client');
 
         return () => {
-            console.log('disconnecting');
             client.removeAllListeners();
             client.disconnect();
         }
