@@ -3,16 +3,18 @@ import Styled from 'styled-components';
 export const Page = Styled.div`
     // TODO img
     display: flex;
-    align-items: center;
     justify-content: center;
     height: 100vh;
     background-image: url('/img/bg.png');
     background-position: center;
     background-size: contain;
+    overflow: auto;
+    align-items: baseline;
 `
 
 export const Card = Styled.div`
-    margin: 20px;
+    max-width: 800px;
+    margin: 15em 20px 20px 20px;
     word-break: break-word;
     text-align: center;
     padding: 2em 4em;

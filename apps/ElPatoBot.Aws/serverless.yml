@@ -1,0 +1,82 @@
+org: niv3kelpato
+app: el-pato-bot-aws
+service: ElPatoBot-Aws
+frameworkVersion: '3'
+
+params:
+  default:
+    UserQuacks: ${self:service}-${sls:stage}-UserQuacks
+    ChannelQuacks: ${self:service}-${sls:stage}-ChannelQuacks
+    TopChannelQuacks: ${self:service}-${sls:stage}-TopChannelQuacks
+    TopUserQuacks: ${self:service}-${sls:stage}-TopUserQuacks
+
+provider:
+  name: aws
+  region: eu-west-2
+  runtime: nodejs16.x
+  environment:
+    USER_QUACKS: ${param:UserQuacks}
+    CHANNEL_QUACKS: ${param:ChannelQuacks}
+    TOP_USER_QUACKS: ${param:TopUserQuacks}
+    TOP_CHANNEL_QUACKS: ${param:TopChannelQuacks}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${param:UserQuacks}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${param:ChannelQuacks}
+
+resources:
+  Resources:
+    UserQuacks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:UserQuacks}
+    ChannelQuacks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:ChannelQuacks}
+    TopChannelQuacks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:TopChannelQuacks}
+    TopUserQuacks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:TopUserQuacks}

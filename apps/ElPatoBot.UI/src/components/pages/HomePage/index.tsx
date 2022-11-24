@@ -2,6 +2,7 @@ import { useState } from "react";
 import InputText from "../../atoms/InputText";
 import Typography from "../../atoms/Typography";
 import ClickToCopy from "../../molecules/ClickToCopy";
+import Leaderboard from "../../organism/Leaderboard";
 import * as S from './styles';
 
 const HomePage = () => {
@@ -46,6 +47,7 @@ const HomePage = () => {
                     </Typography>
                 </div>
             </div>
+            <Leaderboard />
         </S.Card>
     </S.Page>
     );
