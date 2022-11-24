@@ -14,6 +14,7 @@
     "@types/tmi.js": "^1.8.2",
     "@types/ws": "^8.5.3",
     "axios": "^1.2.0",
+    "cross-env": "^7.0.3",
     "koa": "^2.13.4",
     "koa-body": "^6.0.1",
     "patoevents": "*",
@@ -25,6 +26,7 @@
     "ws": "^8.11.0"
   },
   "scripts": {
-    "start": "ts-node ./src/index.ts"
+    "start": "cross-env env=dev ts-node ./src/index.ts",
+    "start-prod": "cross-env env=prd ts-node ./src/index.ts"
   }
 }

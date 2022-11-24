@@ -13,6 +13,7 @@ class InMemoryCache {
     private channels: Record<string, number>;
     public topUsers: Array<QuackEntity>;
     public topChannels: Array<QuackEntity>;
+    private topHasChanged: boolean;
 
     constructor() {
         this.users = {};
@@ -20,6 +21,7 @@ class InMemoryCache {
         this.topChannels = [];
         this.topUsers = [];
         this.getTopFromDb();
+        this.topHasChanged = false;
         setInterval(this.updateDatabase, 10000)
     }
 
@@ -45,50 +47,31 @@ class InMemoryCache {
                 userId: user.userId
             })
         }
-        console.log('user');
-        console.log(this.topUsers);
-        console.log('channel');
-        console.log(this.topChannels);
     }
 
     private updateDatabase = async () => {
-        console.log('---------------------');
-        console.log('Before db update');
-        console.log('Top User');
-        console.log(this.topUsers);
-        console.log('Top Channel');
-        console.log(this.topChannels);
-        console.log('Users');
-        console.log(this.users);
-        console.log('Channels');
-        console.log(this.channels);
-        // update here?
-        await quackRepository.updateTopChannelQuacks(this.topChannels.map((c) => c.userId));
-        await quackRepository.updateTopUserQuacks(this.topUsers.map((u) => u.userId));
+        if (this.topHasChanged) {
+            console.log('Updated top db');
+            await quackRepository.updateTopChannelQuacks(this.topChannels.map((c) => c.userId));
+            await quackRepository.updateTopUserQuacks(this.topUsers.map((u) => u.userId));
+            this.topHasChanged = false;
+        }
 
         for (const key of Object.keys(this.users)){
+            console.log('Updated user db');
             const quacks = this.users[key];
             await quackRepository.setUserQuacks(key, quacks);
             delete this.users[key];
         }
 
         for (const key of Object.keys(this.channels)){
+            console.log('Updated channel db');
             const quacks = this.channels[key];
+            console.log(this.channels);
+            console.log(key, quacks);
             await quackRepository.setChannelQuacks(key, quacks);
             delete this.channels[key];
         }
-
-        console.log('---------------------');
-        console.log('After db update');
-        console.log('Top User');
-        console.log(this.topUsers);
-        console.log('Top Channel');
-        console.log(this.topChannels);
-        console.log('Users');
-        console.log(this.users);
-        console.log('Channels');
-        console.log(this.channels);
-        console.log('---------------------');
     }
 
     private getUserQuacks = async (userId:string) => {
@@ -116,12 +99,14 @@ class InMemoryCache {
                     u.quackCount = quackCount
                 }
             });
+            this.topHasChanged = true;
             return;
         }
 
         // si es menos lo agregamos sin mas
-        if (this.topUsers.length <= MAX_TOP_ITEMS) {
+        if (this.topUsers.length < MAX_TOP_ITEMS) {
             this.topUsers.push({ quackCount, userId });
+            this.topHasChanged = true;
             return;
         }
 
@@ -130,9 +115,9 @@ class InMemoryCache {
             .sort((a,b) => b.quackCount - a.quackCount);
 
         // if less than limit
-        sortedQuacks
         const lastItem = sortedQuacks[sortedQuacks.length - 1];
         if (quackCount > lastItem.quackCount) {
+            this.topHasChanged = true;
             sortedQuacks.pop();
             sortedQuacks.push({ quackCount, userId });
             this.topUsers = sortedQuacks;
@@ -148,12 +133,14 @@ class InMemoryCache {
                     u.quackCount = quackCount
                 }
             });
+            this.topHasChanged = true;
             return;
         }
 
         // si es menos lo agregamos sin mas
         if (this.topChannels.length < (MAX_TOP_ITEMS - 1)) {
             this.topChannels.push({ quackCount, userId });
+            this.topHasChanged = true;
             return;
         }
 
@@ -169,6 +156,7 @@ class InMemoryCache {
                     quackCount,
                     userId
                 }];
+            this.topHasChanged = true;
         }
     }
 

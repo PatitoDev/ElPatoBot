@@ -3,7 +3,7 @@ import SECRETS from 'secrets';
 import tmi from 'tmi.js';  
 import ws from 'ws';
 import InMemoryCache from '../InMemoryCache';
-import quackRepository from '../repository/quackRepository';
+import twitchApi from '../twitchApi';
 
 class TwitchClient {
     channel: string;
@@ -16,7 +16,7 @@ class TwitchClient {
         this.clientConnections = []
         this.cache = cache;
         this.twitchClient = new tmi.Client({
-            options: { debug: true },
+            options: { debug: false },
             identity: {
                 username: SECRETS.twitch.username,
                 password: `oauth:${SECRETS.twitch.token}`,
@@ -27,15 +27,25 @@ class TwitchClient {
         this.twitchClient.connect().catch(console.error);
 
         this.twitchClient.on('message', async (channel, tags, message, self) => {
-            if (message.toLowerCase().trim() === "!q") {
-                this.twitchClient.say(channel, '*quack*');
-                return;
-            }
+            if (message.toLowerCase().trim() === "!quackrank") {
+                const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
+                const usersQuacks = cache.topUsers.map((user) => {
+                    const twitchUser = users.data.data.find(u => u.id === user.userId);
+                    if (!twitchUser) return;
 
-            if (message.toLowerCase().trim() === "!quackRank") {
+                    return {
+                        name: twitchUser.display_name,
+                        quacks: user.quackCount,
+                    }
+                });
+
                 let msg = 'Quack Rank:'
-                msg = cache.topUsers.map((u) => ` ${u.userId} a quackeado ${u.quackCount} `).join('');
-                this.twitchClient.say(channel, msg);
+                msg = usersQuacks
+                    .filter(u => u !== undefined)
+                    .sort((a,b) => b!.quacks - a!.quacks)
+                    .slice(0, 5)
+                    .map((u) => `  🦆 ${u?.name} a quackeado ${u?.quacks} `).join('');
+                await this.twitchClient.say(channel, msg);
                 return;
             }
             

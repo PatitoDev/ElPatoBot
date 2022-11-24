@@ -109,6 +109,7 @@ const Leaderboard = () => {
 
             {userQuacks && selectedRankType === 0 && userQuacks
             .sort((a, b) => b.quacks - a.quacks)
+            .slice(0, 9)
             .map((user, index) => (
                 <QuackCard
                     key={user.name}
@@ -121,8 +122,10 @@ const Leaderboard = () => {
         
             {channelQuacks && selectedRankType === 1 && channelQuacks
             .sort((a, b) => b.quacks - a.quacks)
+            .slice(0, 9)
             .map((channel, index) => (
                 <QuackCard
+                    
                     key={channel.name}
                     name={channel.name}
                     profileUrl={channel.profileImg}

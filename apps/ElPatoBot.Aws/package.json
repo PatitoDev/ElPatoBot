@@ -8,6 +8,6 @@
   },
   "scripts": {
     "deploy:dev": "serverless deploy --stage dev",
-    "deploy:production": "serverless deploy --stage production"
+    "deploy:prod": "serverless deploy --stage prd"
   }
 }

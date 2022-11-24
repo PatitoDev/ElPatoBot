@@ -17,7 +17,7 @@ const QuackCard = ({
     rankPosition,
     description
 }: QuackCardProps) => (
-    <S.Card>
+    <S.Card rankPos={rankPosition}>
         <Typography color="white" variant='title'>
             {rankPosition}
         </Typography>

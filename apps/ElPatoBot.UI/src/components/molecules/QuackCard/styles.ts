@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Card = styled.div`
+export const Card = styled.div<{rankPos: number}>`
     color: ${(prop) => prop.color};
     background-color: ${({theme}) => theme.colors.black };
     border-radius: 1em;
@@ -17,6 +17,7 @@ export const Card = styled.div`
     > :last-child {
         margin-left: auto;
     }
+    opacity: ${({rankPos}) => 1 - (((rankPos - 3) * 0.15))};
 `;
 
 export const TitleContainer = styled.div`

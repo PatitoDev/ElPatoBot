@@ -72,7 +72,7 @@ appRouter.get('/users/quacks', async (ctx, next) => {
         });
         ctx.response.body = respBody.filter((i) => i !== undefined);
     } catch (e){
-        //console.log('Error from user api : ', e);
+        console.log('Error from user api : ', e);
     }
 })
 
@@ -83,7 +83,6 @@ appRouter.get('/channels/quacks', async (ctx, next) => {
             return;
         }
         const channels = await twitchApi.getUserProfileByName(cache.topChannels.map((u) => u.userId));
-        console.log('channels found:', channels.data);
         const respBody:Array<ChannelQuacksResponse | undefined>  = cache.topChannels.map((channel) => {
             const twitchUser = channels.data.data.find(u => u.login === channel.userId.replace('#', ''));
             if (!twitchUser) return;

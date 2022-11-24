@@ -106,11 +106,11 @@ const getTopUserQuacks = async () => {
 }
 
 const updateTopUserQuacks = async (topUserQuacks: Array<string>) => {
-    updateTopTable(topUserQuacks, 'TopUserQuacks');
+    await updateTopTable(topUserQuacks, 'TopUserQuacks');
 }
 
 const updateTopChannelQuacks = async (topChannelQuacks: Array<string>) => {
-    updateTopTable(topChannelQuacks, 'TopChannelQuacks');
+    await updateTopTable(topChannelQuacks, 'TopChannelQuacks');
 }
 
 const updateTopTable = async (userIds: Array<string>, tableKey: TableKey) => {
