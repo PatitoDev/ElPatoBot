@@ -8,12 +8,14 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "start": "turbo run start"
+    "start": "turbo run start",
+    "start:dev": "turbo run start:dev",
+    "start:prd": "turbo run start:prd",
+    "turbo": "latest"
   },
   "devDependencies": {
     "eslint-config-custom": "*",
-    "prettier": "latest",
-    "turbo": "latest"
+    "prettier": "latest"
   },
   "engines": {
     "node": ">=14.0.0"

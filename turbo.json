@@ -1,6 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
+    "start:dev": {
+      "cache": false
+    },
+    "start:prd": {
+    },
     "start": {
       "cache": false
     },

@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { ChannelQuacksResponse, UserQuacksResponse } from 'responses';
 import QuackCard from '../../molecules/QuackCard';
 import Typography from '../../atoms/Typography';
-
-const baseUrl = 'http://localhost:8084/'
+import settings from '../../../settings';
 
 interface State {
     userQuacks: Array<UserQuacksResponse> | null,
@@ -55,8 +54,8 @@ const Leaderboard = () => {
                     error: false,
                     userQuacks: null,
                 });
-                const userQuackResp = await axios.get(baseUrl + 'users/quacks');
-                const channelQuackResp = await axios.get(baseUrl + 'channels/quacks');
+                const userQuackResp = await axios.get(settings.serverUrl + 'users/quacks');
+                const channelQuackResp = await axios.get(settings.serverUrl + 'channels/quacks');
                 setState({
                     isLoading: false,
                     channelQuacks: channelQuackResp.data,

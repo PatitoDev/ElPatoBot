@@ -27,6 +27,7 @@
   },
   "scripts": {
     "start": "cross-env env=dev ts-node ./src/index.ts",
-    "start-prod": "cross-env env=prd ts-node ./src/index.ts"
+    "start:dev": "cross-env env=dev ts-node ./src/index.ts",
+    "start:prd": "cross-env env=prd ts-node ./src/index.ts"
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BaseEvent, ConnectEvent } from 'patoEvents';
+import settings from "../../../settings";
 
 const parseWebsocketMessage = (message: MessageEvent) => {
     if (typeof message.data === 'string') return message.data;
@@ -11,7 +12,7 @@ const parseWebsocketMessage = (message: MessageEvent) => {
 
 const BotPage = () => {
     const { userName } = useParams<{userName: string}>();
-    const [wsClient, setWsClient] = useState<WebSocket>(new WebSocket('ws://localhost:8084'));
+    const [wsClient, setWsClient] = useState<WebSocket>(new WebSocket(settings.websocketUrl));
 
     useEffect(() => {
         wsClient.onopen = () => {
