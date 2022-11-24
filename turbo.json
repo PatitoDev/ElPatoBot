@@ -4,6 +4,8 @@
     "start:dev": {
       "cache": false
     },
+    "start:ui": {
+    },
     "start:prd": {
     },
     "start": {

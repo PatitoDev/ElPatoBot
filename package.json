@@ -11,7 +11,7 @@
     "start": "turbo run start",
     "start:dev": "turbo run start:dev",
     "start:prd": "turbo run start:prd",
-    "turbo": "latest"
+    "start:ui": "turbo run start:ui"
   },
   "devDependencies": {
     "eslint-config-custom": "*",
@@ -21,7 +21,8 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "eslint-plugin-react": "^7.31.11"
+    "eslint-plugin-react": "^7.31.11",
+    "turbo": "latest"
   },
   "packageManager": "yarn@1.22.19"
 }
