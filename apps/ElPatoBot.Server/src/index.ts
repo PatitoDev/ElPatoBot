@@ -45,6 +45,7 @@ wss.on('connection', (socket) => {
     };
 
     socket.on('close', function() {
+        console.log('Someone disconnected');
         for (const key of Object.keys(clients)) {
             clients[key].removeFromClient(socket);
         }
@@ -54,14 +55,20 @@ wss.on('connection', (socket) => {
 const appRouter = new Router();
 
 appRouter.get('/users/quacks', async (ctx, next) => {
+    console.log('/users/quacks');
     try {
         if (cache.topUsers.length === 0) {
             ctx.response.body = [];
             return;
         }
         const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
+        if (!users.data) {
+            console.log('twitch returned weird data for users:');
+            console.log(users);
+            return;
+        }
         const respBody:Array<UserQuacksResponse | undefined>  = cache.topUsers.map((user) => {
-            const twitchUser = users.data.data.find(u => u.id === user.userId);
+            const twitchUser = users.data.find(u => u.id === user.userId);
             if (!twitchUser) return;
 
             return {
@@ -72,19 +79,25 @@ appRouter.get('/users/quacks', async (ctx, next) => {
         });
         ctx.response.body = respBody.filter((i) => i !== undefined);
     } catch (e){
-        console.log('Error from user api : ', e);
+        console.log(e);
+        console.log('Error from user api : ', (e as any).data);
     }
 })
 
 appRouter.get('/channels/quacks', async (ctx, next) => {
+    console.log('/channels/quacks');
     try {
         if (cache.topChannels.length === 0) {
             ctx.response.body = [];
             return;
         }
         const channels = await twitchApi.getUserProfileByName(cache.topChannels.map((u) => u.userId));
+        if (!channels.data) {
+            console.log('twitch returned weird data for channels:', channels);
+            return;
+        }
         const respBody:Array<ChannelQuacksResponse | undefined>  = cache.topChannels.map((channel) => {
-            const twitchUser = channels.data.data.find(u => u.login === channel.userId.replace('#', ''));
+            const twitchUser = channels.data.find(u => u.login === channel.userId.replace('#', ''));
             if (!twitchUser) return;
 
             return {

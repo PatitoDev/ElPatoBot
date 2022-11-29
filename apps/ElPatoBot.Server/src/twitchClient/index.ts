@@ -28,47 +28,54 @@ class TwitchClient {
 
         this.twitchClient.on('message', async (channel, tags, message, self) => {
             if (message.toLowerCase().trim() === "!quackrank") {
-                const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
-                const usersQuacks = cache.topUsers.map((user) => {
-                    const twitchUser = users.data.data.find(u => u.id === user.userId);
-                    if (!twitchUser) return;
+                try {
+                    const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
+                    const usersQuacks = cache.topUsers.map((user) => {
+                        const twitchUser = users.data.find(u => u.id === user.userId);
+                        if (!twitchUser) return;
 
-                    return {
-                        name: twitchUser.display_name,
-                        quacks: user.quackCount,
-                    }
-                });
+                        return {
+                            name: twitchUser.display_name,
+                            quacks: user.quackCount,
+                        }
+                    });
 
-                let msg = 'Quack Rank:'
-                msg = usersQuacks
-                    .filter(u => u !== undefined)
-                    .sort((a,b) => b!.quacks - a!.quacks)
-                    .slice(0, 5)
-                    .map((u) => `  🦆 ${u?.name} a quackeado ${u?.quacks} `).join('');
-                await this.twitchClient.say(channel, msg);
+                    let msg = 'Quack Rank:'
+                    msg = usersQuacks
+                        .filter(u => u !== undefined)
+                        .sort((a,b) => b!.quacks - a!.quacks)
+                        .slice(0, 5)
+                        .map((u) => `  🦆 ${u?.name} a quackeado ${u?.quacks} `).join('');
+                    await this.twitchClient.say(channel, msg);
+                } catch (e) {
+                    console.log('Error when receiving quackrank command: ', e);
+                }
                 return;
             }
             
 
             if (message.toLowerCase().trim().includes('*quack*')){
-                if (tags['user-id']) {
-                    console.log(`quack for user ${tags['user-id']}`);
-                    cache.addOneQuack(tags['user-id'], channel);
-                } else {
-                    console.log('could not find user-id');
-                }
-
-                this.clientConnections.forEach((c) => {
-                    if (
-                        c.readyState === c.CLOSED ||
-                        c.readyState === c.CLOSING) {
-                            this.removeFromClient(c);
-                            return;
+                try {
+                    if (tags['user-id']) {
+                        cache.addOneQuack(tags['user-id'], channel);
+                    } else {
+                        console.log('could not find user-id');
                     }
-                    c.send(JSON.stringify({
-                        type: 'quack',
-                    } as QuackEvent))
-                });
+
+                    this.clientConnections.forEach((c) => {
+                        if (
+                            c.readyState === c.CLOSED ||
+                            c.readyState === c.CLOSING) {
+                                this.removeFromClient(c);
+                                return;
+                        }
+                        c.send(JSON.stringify({
+                            type: 'quack',
+                        } as QuackEvent))
+                    });
+                } catch (e) {
+                    console.log('Error when receiving *quack*:', e);
+                }
             }
         });
     }

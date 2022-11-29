@@ -17,6 +17,8 @@
     },
     "deploy:dev": {
     },
+    "deploy:prd": {
+    },
     "lint": {
       "outputs": []
     },

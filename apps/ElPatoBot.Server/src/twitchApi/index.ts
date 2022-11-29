@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch, { Headers } from 'node-fetch';
 import SECRETS from 'secrets';
 
 export interface TwitchUser {
@@ -10,29 +10,28 @@ export interface TwitchUser {
 }
 
 const getUserProfileById = async (userId: Array<string>) => {
-    console.log(userId);
-    const url =  'https://api.twitch.tv/helix/users?' + userId.map((id) => `id=${id}`).join('&');
-    console.log(url);
-    return axios.get<{data: Array<TwitchUser>}>(url, {
-        headers: {
-            'Client-Id': SECRETS.twitch.clientId,
-            'Authorization': `Bearer ${SECRETS.twitch.token}`
-        }
-    });
+    const url =  'https://api.twitch.tv/helix/users?' + userId
+        .map((id) => `id=${id}`)
+        .join('&');
+    const headers = new Headers();
+    headers.set('Client-Id', SECRETS.twitch.clientId);
+    headers.set('Authorization', `Bearer ${SECRETS.twitch.token}`);
+    const resp = await fetch(url, { headers });
+    const data = await resp.json();
+    return data as { data: Array<TwitchUser> };
 }
 
 const getUserProfileByName = async (userId: Array<string>) => {
-    const url =  'https://api.twitch.tv/helix/users?' + userId.map((id) => `login=${id.replace('#', '')}`).join('&');
-    console.log(url);
-    return axios.get<{data: Array<TwitchUser>}>(url, {
-        params: {
-            login: userId
-        },
-        headers: {
-            'Client-Id': SECRETS.twitch.clientId,
-            'Authorization': `Bearer ${SECRETS.twitch.token}`
-        }
-    });
+    const url =  'https://api.twitch.tv/helix/users?' + userId
+        .map((id) => `login=${id.replace('#', '')}`)
+        .join('&');
+
+    const headers = new Headers();
+    headers.set('Client-Id', SECRETS.twitch.clientId);
+    headers.set('Authorization', `Bearer ${SECRETS.twitch.token}`);
+    const resp = await fetch(url, { headers });
+    const data = await resp.json();
+    return data as { data: Array<TwitchUser> };
 }
 
 const twitchApi = {

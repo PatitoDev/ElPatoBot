@@ -28,7 +28,6 @@ class InMemoryCache {
     private getTopFromDb =  async () => {
         this.topChannels = [];
         const channelQuacks = await quackRepository.getTopChannelQuacks()
-        console.log('channel quakcs', channelQuacks);
         for (const channel of channelQuacks){
             const quacks = await quackRepository.getQuacksForChannel(channel.userId);
             this.topChannels.push({
@@ -39,7 +38,6 @@ class InMemoryCache {
 
         this.topUsers = [];
         const userQuacks = await quackRepository.getTopUserQuacks()
-        console.log('user quakcs', userQuacks);
         for (const user of userQuacks){
             const quacks = await quackRepository.getQuacksForUser(user.userId);
             this.topUsers.push({
@@ -50,27 +48,37 @@ class InMemoryCache {
     }
 
     private updateDatabase = async () => {
-        if (this.topHasChanged) {
-            console.log('Updated top db');
-            await quackRepository.updateTopChannelQuacks(this.topChannels.map((c) => c.userId));
-            await quackRepository.updateTopUserQuacks(this.topUsers.map((u) => u.userId));
-            this.topHasChanged = false;
-        }
+        try {
+            if (this.topHasChanged) {
+                console.log('Updated top db');
+                await quackRepository.updateTopChannelQuacks(this.topChannels
+                    .sort((c) => c.quackCount)
+                    .slice(0, MAX_TOP_ITEMS)
+                    .map((c) => c.userId));
+                await quackRepository.updateTopUserQuacks(this.topUsers
+                    .sort(u => u.quackCount)
+                    .slice(0, MAX_TOP_ITEMS)
+                    .map((u) => u.userId));
+                this.topHasChanged = false;
+            }
 
-        for (const key of Object.keys(this.users)){
-            console.log('Updated user db');
-            const quacks = this.users[key];
-            await quackRepository.setUserQuacks(key, quacks);
-            delete this.users[key];
-        }
+            for (const key of Object.keys(this.users)){
+                console.log('Updated user db');
+                const quacks = this.users[key];
+                await quackRepository.setUserQuacks(key, quacks);
+                delete this.users[key];
+            }
 
-        for (const key of Object.keys(this.channels)){
-            console.log('Updated channel db');
-            const quacks = this.channels[key];
-            console.log(this.channels);
-            console.log(key, quacks);
-            await quackRepository.setChannelQuacks(key, quacks);
-            delete this.channels[key];
+            for (const key of Object.keys(this.channels)){
+                console.log('Updated channel db');
+                const quacks = this.channels[key];
+                console.log(this.channels);
+                console.log(key, quacks);
+                await quackRepository.setChannelQuacks(key, quacks);
+                delete this.channels[key];
+            }
+        } catch (e) {
+            console.log('Error on interval:', e);
         }
     }
 

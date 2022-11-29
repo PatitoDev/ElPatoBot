@@ -28,6 +28,10 @@ const getQuacksForChannel = async (userId: string) => {
 }
 
 const setUserQuacks = async (userId: string, quacks: number) => {
+    if (typeof userId !== 'string' ||
+        typeof quacks !== 'number'
+    ) return;
+
     await client.put({
         TableName: Tables.UserQuacks,
         Item: {
@@ -38,6 +42,10 @@ const setUserQuacks = async (userId: string, quacks: number) => {
 }
 
 const setChannelQuacks = async (userId: string, quacks: number) => {
+    if (typeof userId !== 'string' ||
+        typeof quacks !== 'number'
+    ) return;
+
     await client.put({
         TableName: Tables.ChannelQuacks,
         Item: {
@@ -48,6 +56,10 @@ const setChannelQuacks = async (userId: string, quacks: number) => {
 }
 
 const updateUserQuacks = async (userId: string, quacksToAdd: number) => {
+    if (typeof userId !== 'string' ||
+        typeof quacksToAdd !== 'number'
+    ) return;
+
     const userQuacks = await client.get({
         TableName: Tables.UserQuacks,
         Key: {
@@ -70,6 +82,10 @@ const updateUserQuacks = async (userId: string, quacksToAdd: number) => {
 }
 
 const updateChannelQuacks = async (userId: string, quacksToAdd: number) => {
+    if (typeof userId !== 'string' ||
+        typeof quacksToAdd !== 'number'
+    ) return;
+
     const userQuacks = await client.get({
         TableName: Tables.ChannelQuacks,
         Key: {
@@ -121,6 +137,7 @@ const updateTopTable = async (userIds: Array<string>, tableKey: TableKey) => {
     const items = resp.Items as Array<{ userId: string }> | undefined;
     if (!items || items.length === 0) {
         for (const userId of userIds) {
+            if (typeof userId !== 'string') return;
             await client.put({
                 TableName: Tables[tableKey],
                 Item: {
@@ -133,7 +150,12 @@ const updateTopTable = async (userIds: Array<string>, tableKey: TableKey) => {
     
     const itemsToAdd = userIds
         .filter((user) => !(items.find((itemInDb) => itemInDb.userId === user))); 
+    const itemsToRemove = items
+        .filter((itemInDb) => !(userIds.find((user) => itemInDb.userId === user))); 
+
+    console.log(`Items to add to ${tableKey}:`, itemsToAdd);
     for (const userId of itemsToAdd) {
+        if (typeof userId !== 'string') return;
         await client.put({
             TableName: Tables[tableKey],
             Item: {
@@ -142,9 +164,10 @@ const updateTopTable = async (userIds: Array<string>, tableKey: TableKey) => {
         });
     }
 
-    const itemsToRemove = items
-        .filter((itemInDb) => !(userIds.find((user) => itemInDb.userId === user))); 
-    for (const userId of itemsToRemove) {
+    console.log(`Items to remove to ${tableKey}:`, itemsToRemove);
+    for (const { userId } of itemsToRemove) {
+        if (typeof userId !== 'string') return;
+
         await client.delete({
             TableName: Tables[tableKey],
             Key: {
