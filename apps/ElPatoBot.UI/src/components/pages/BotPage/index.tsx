@@ -35,6 +35,16 @@ const BotPage = () => {
                 audio.play(); 
             }
         }
+
+        wsClient.onclose = (e) => {
+            console.log('lost connection to ws server, reconnecting...');
+            setWsClient(new WebSocket(settings.websocketUrl));
+        }
+
+        wsClient.onerror = (e) => {
+            console.log('Error on connecting to ws ', e)
+        }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wsClient]);
 
