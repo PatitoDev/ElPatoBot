@@ -45,7 +45,7 @@ class TwitchClient {
                         .filter(u => u !== undefined)
                         .sort((a,b) => b!.quacks - a!.quacks)
                         .slice(0, 5)
-                        .map((u) => `  🦆 ${u?.name} a quackeado ${u?.quacks} `).join('');
+                        .map((u) => `  🦆 ${u?.name} ha quackeado ${u?.quacks} `).join('');
                     await this.twitchClient.say(channel, msg);
                 } catch (e) {
                     console.log('Error when receiving quackrank command: ', e);
