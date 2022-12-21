@@ -3,20 +3,21 @@ import SECRETS from 'secrets';
 import tmi from 'tmi.js';  
 import ws from 'ws';
 import InMemoryCache from '../InMemoryCache';
+import { env } from '../settings';
 import twitchApi from '../twitchApi';
 
 class TwitchClient {
-    channel: string;
-    clientConnections: Array<ws.WebSocket>;
-    twitchClient: tmi.Client;
-    cache: InMemoryCache;
+    public channel: string;
+    private clientConnections: Array<ws.WebSocket>;
+    private twitchClient: tmi.Client;
+    private cache: InMemoryCache;
 
     constructor(channel:string, cache: InMemoryCache) {
         this.channel = channel;
         this.clientConnections = []
         this.cache = cache;
         this.twitchClient = new tmi.Client({
-            options: { debug: false },
+            options: { debug: env === 'dev' },
             identity: {
                 username: SECRETS.twitch.username,
                 password: `oauth:${SECRETS.twitch.token}`,
@@ -29,8 +30,8 @@ class TwitchClient {
         this.twitchClient.on('message', async (channel, tags, message, self) => {
             if (message.toLowerCase().trim() === "!quackrank") {
                 try {
-                    const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
-                    const usersQuacks = cache.topUsers.map((user) => {
+                    const users = await twitchApi.getUserProfileById(this.cache.topUsers.map((u) => u.userId));
+                    const usersQuacks = this.cache.topUsers.map((user) => {
                         const twitchUser = users.data.find(u => u.id === user.userId);
                         if (!twitchUser) return;
 
@@ -53,11 +54,10 @@ class TwitchClient {
                 return;
             }
             
-
             if (message.toLowerCase().trim().includes('*quack*')){
                 try {
                     if (tags['user-id']) {
-                        cache.addOneQuack(tags['user-id'], channel);
+                        this.cache.addOneQuack(tags['user-id'], channel);
                     } else {
                         console.log('could not find user-id');
                     }
@@ -80,9 +80,17 @@ class TwitchClient {
         });
     }
 
+    public killTwitchConnection = async () => (
+        await this.twitchClient.disconnect()
+    );
+
     public addToClient = (client:ws.WebSocket) => {
         this.clientConnections.push(client);
     }
+
+    public getConnections = () => (
+        this.clientConnections
+    )
 
     public removeFromClient = (client: ws.WebSocket) => {
         this.clientConnections = this.clientConnections

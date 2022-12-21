@@ -11,7 +11,8 @@
     "start": "turbo run start",
     "start:dev": "turbo run start:dev",
     "start:prd": "turbo run start:prd",
-    "start:ui": "turbo run start:ui"
+    "start:ui": "turbo run start:ui",
+    "clean": "rimraf node_modules"
   },
   "devDependencies": {
     "eslint-config-custom": "*",

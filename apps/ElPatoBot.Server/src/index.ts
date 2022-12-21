@@ -8,12 +8,15 @@ import TwitchClient from './twitchClient';
 import { ChannelQuacksResponse, UserQuacksResponse } from 'responses';
 import InMemoryCache from './InMemoryCache';
 import twitchApi from './twitchApi';
+import { env, settings } from './settings';
 
 const cache = new InMemoryCache();
 const app = new Koa();
 const clients: Record<string, TwitchClient> = {};
 
-app.use(cors());
+app.use(cors({
+    origin: settings.corsDomain,
+}));
 
 const parseWebsocketMessage = (message: ws.MessageEvent) => {
     if (typeof message.data === 'string') return message.data;
@@ -44,18 +47,28 @@ wss.on('connection', (socket) => {
         }
     };
 
-    socket.on('close', function() {
+    socket.on('close', async function() {
         console.log('Someone disconnected');
         for (const key of Object.keys(clients)) {
-            clients[key].removeFromClient(socket);
+            const client = clients[key];
+            client.removeFromClient(socket);
+            if (client.getConnections().length === 0 ) {
+                console.log(`All connections for channel ${client.channel} disconnected`);
+                await client.killTwitchConnection();
+                delete clients[key];
+            }
         }
     });
 });
 
 const appRouter = new Router();
 
-appRouter.get('/users/quacks', async (ctx, next) => {
-    console.log('/users/quacks');
+appRouter.use('/', async (ctx, next) => {
+    console.log(`[ ${ctx.method} ] - ${ctx.url}`);
+    await next();
+});
+
+appRouter.get('/users/quacks', async (ctx) => {
     try {
         if (cache.topUsers.length === 0) {
             ctx.response.body = [];
@@ -84,8 +97,7 @@ appRouter.get('/users/quacks', async (ctx, next) => {
     }
 })
 
-appRouter.get('/channels/quacks', async (ctx, next) => {
-    console.log('/channels/quacks');
+appRouter.get('/channels/quacks', async (ctx) => {
     try {
         if (cache.topChannels.length === 0) {
             ctx.response.body = [];
@@ -113,6 +125,11 @@ appRouter.get('/channels/quacks', async (ctx, next) => {
     }
 })
 
+
 app.use(appRouter.routes());
 
-server.listen(8084)
+server.on('listening', () => {
+    console.log(`Started listening on http://localhost:${settings.port} for ${env} environment`);
+});
+
+server.listen(settings.port);

@@ -24,6 +24,8 @@
     },
     "dev": {
       "cache": false
+    },
+    "clean": {
     }
   }
 }

@@ -1,1 +1,0 @@
-web: turbo start:prd
