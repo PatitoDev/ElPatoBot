@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
     width: 100%;
@@ -11,12 +11,26 @@ export const RankTypesMenu = styled.div`
     display: flex;
     width: 100%;
     > *:not(:last-child){
-        margin-right: 0.5em;
+        margin-right: 0.8em;
     }
 `
 
 export const MenuButton = styled.button<{isSelected: boolean}>`
-    font-weight: ${({isSelected}) => isSelected ? 'bold' : 'regular'};
+
+    ${({ isSelected }) => !isSelected && css`
+        opacity: 0.5;
+        :hover {
+            color: ${({theme}) => theme.colors.orange};
+            opacity: 0.8;
+        }
+    `}
+
+    > *:first-child {
+        margin-right: 0.2em;
+    }
+
+    color: ${({theme}) => theme.colors.black};
+    font-weight: bold;
     border: none;
     background-color: initial;
     padding: 0;

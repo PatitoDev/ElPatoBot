@@ -1,6 +1,6 @@
 import * as S from './styles';
-import { faExclamationTriangle, faSpider, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera, faExclamationTriangle, faSpider, faSpinner, faUser, faVideoCamera, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ChannelQuacksResponse, UserQuacksResponse } from 'responses';
@@ -17,16 +17,19 @@ interface State {
 
 interface RankingType {
     id: number,
+    icon: IconDefinition,
     name: string,
 }
 
-const rankingTypes = [
+const rankingTypes: Array<RankingType> = [
     {
         id: 0,
+        icon: faUser,
         name: 'Quacks Por Usuario',
     },
     {
         id: 1,
+        icon: faVideoCamera,
         name: 'Quacks Por Canal',
     },
 ]
@@ -101,6 +104,7 @@ const Leaderboard = () => {
                         onClick={() => {
                             setSelectedRankType(rankType.id)
                         }}>
+                        <FontAwesomeIcon icon={rankType.icon} />
                         {rankType.name}
                     </S.MenuButton>
                 ))}
@@ -124,13 +128,13 @@ const Leaderboard = () => {
             .slice(0, 9)
             .map((channel, index) => (
                 <QuackCard
-                    
                     key={channel.name}
                     name={channel.name}
                     profileUrl={channel.profileImg}
                     quacks={channel.quacks}
                     rankPosition={index + 1}
                     description={channel.description}
+                    url={`https://twitch.tv/${channel.name}`}
                 />
             ))}
         </S.Container>

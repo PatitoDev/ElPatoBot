@@ -6,4 +6,5 @@ export const Input = Styled.input`
     border: solid 3px ${({theme}) => theme.colors.black};
     padding: 1em 1.5em;
     font-size: 1.5em;
+    border-radius: 3px;
 `;

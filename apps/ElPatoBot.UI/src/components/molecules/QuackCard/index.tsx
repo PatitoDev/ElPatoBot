@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from '../../atoms/Link';
 import Typography from '../../atoms/Typography';
 import * as S from './styles';
 
@@ -7,7 +8,8 @@ export interface QuackCardProps {
     profileUrl: string,
     name: string,
     description?: string,
-    quacks: number
+    quacks: number,
+    url?: string,
 }
 
 const QuackCard = ({
@@ -15,7 +17,8 @@ const QuackCard = ({
     profileUrl,
     quacks,
     rankPosition,
-    description
+    description,
+    url
 }: QuackCardProps) => (
     <S.Card rankPos={rankPosition}>
         <Typography color="white" variant='title'>
@@ -23,9 +26,17 @@ const QuackCard = ({
         </Typography>
         <img src={profileUrl} alt={name} />
         <S.TitleContainer>
-            <Typography color='white' variant='action'>
-                {name}
-            </Typography>
+            { url ?
+                <Link href={url} target="_blank">
+                    <Typography color='white' variant='action'>
+                        {name}
+                    </Typography>
+                </Link>
+                :
+                <Typography color='white' variant='action'>
+                    {name}
+                </Typography>
+            }
             {description && (
                 <Typography color='white' variant='description'>
                     {description}
