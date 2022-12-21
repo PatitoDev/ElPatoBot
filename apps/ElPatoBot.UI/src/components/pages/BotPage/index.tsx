@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { BaseEvent, ConnectEvent } from 'patoEvents';
+import { BaseEvent, ConnectEvent } from 'patoevents';
 import settings from "../../../settings";
 
 const parseWebsocketMessage = (message: MessageEvent) => {
