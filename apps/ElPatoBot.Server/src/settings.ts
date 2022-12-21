@@ -10,7 +10,7 @@ const allSettings:Record<'dev' | 'prd', {
     },
     prd: {
         port: 8084,
-        corsDomain: 'ElPatoBot.com'
+        corsDomain: 'elpatobot.com'
     }
 }
 
