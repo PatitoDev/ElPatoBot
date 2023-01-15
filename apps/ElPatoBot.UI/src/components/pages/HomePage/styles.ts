@@ -1,13 +1,9 @@
 import Styled from 'styled-components';
 
 export const Page = Styled.div`
-    // TODO img
     display: flex;
     justify-content: center;
     height: 100vh;
-    background-image: url('/img/bg.png');
-    background-position: center;
-    background-size: contain;
     overflow: auto;
     align-items: baseline;
 `
