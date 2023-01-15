@@ -54,8 +54,8 @@ wss.on('connection', (socket) => {
             client.removeFromClient(socket);
             if (client.getConnections().length === 0 ) {
                 console.log(`All connections for channel ${client.channel} disconnected`);
-                await client.killTwitchConnection();
-                delete clients[key];
+                //await client.killTwitchConnection();
+                //delete clients[key];
             }
         }
     });
