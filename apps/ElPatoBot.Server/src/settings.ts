@@ -1,16 +1,21 @@
 export const env = process.env['env'] as 'dev' | 'prd';
 
-const allSettings:Record<'dev' | 'prd', {
+interface Settings {
     port: number,
-    corsDomain: string
-}> = {
+    corsDomain: string,
+    delayBetweenUserQuacksInSeconds: number,
+}
+
+const allSettings:Record<'dev' | 'prd', Settings> = {
     dev: {
         port: 8084,
-        corsDomain: '*'
+        corsDomain: '*',
+        delayBetweenUserQuacksInSeconds: 2, 
     },
     prd: {
         port: 8084,
-        corsDomain: 'https://elpatobot.com'
+        corsDomain: 'https://elpatobot.com',
+        delayBetweenUserQuacksInSeconds: 5 
     }
 }
 

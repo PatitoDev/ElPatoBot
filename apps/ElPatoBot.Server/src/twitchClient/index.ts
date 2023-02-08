@@ -3,7 +3,8 @@ import SECRETS from 'secrets';
 import tmi from 'tmi.js';  
 import ws from 'ws';
 import InMemoryCache from '../InMemoryCache';
-import { env } from '../settings';
+import QuackRestrictor from '../quackRestrictor';
+import { env, settings } from '../settings';
 import twitchApi from '../twitchApi';
 
 class TwitchClient {
@@ -11,8 +12,10 @@ class TwitchClient {
     private clientConnections: Array<ws.WebSocket>;
     private twitchClient: tmi.Client;
     private cache: InMemoryCache;
+    private quackRestrictor: QuackRestrictor;
 
     constructor(channel:string, cache: InMemoryCache) {
+        this.quackRestrictor = new QuackRestrictor();
         this.channel = channel;
         this.clientConnections = []
         this.cache = cache;
@@ -56,11 +59,19 @@ class TwitchClient {
             
             if (message.toLowerCase().trim().includes('*quack*')){
                 try {
-                    if (tags['user-id']) {
-                        this.cache.addOneQuack(tags['user-id'], channel);
-                    } else {
-                        console.log('could not find user-id');
+                    const userId = tags['user-id'];
+                    if (!userId) {
+                        console.log('user id not found in tags. Aborting...');
+                        return;
                     }
+
+                    const allowed = await this.quackRestrictor.isQuackAllowed(userId, async () => {
+                        await this.twitchClient.say(channel, `tranquilo @${tags['username']}! estas quackeando muy rapido, limita tus quacks a un quack cada ${settings.delayBetweenUserQuacksInSeconds} segundos`);
+                    });
+
+                    if (!allowed) return;
+
+                    this.cache.addOneQuack(userId, channel);
 
                     this.clientConnections.forEach((c) => {
                         if (
