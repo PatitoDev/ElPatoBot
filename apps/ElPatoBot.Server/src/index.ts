@@ -135,7 +135,7 @@ appRouter.get('/channels/quacks', async (ctx) => {
         }
         const channels = await twitchApi.getUserProfileByName(cache.topChannels.map((u) => u.userId));
         const respBody:Array<ChannelQuacksResponse | undefined>  = cache.topChannels.map((channel) => {
-            const twitchUser = channels.find(u => u.displayName === channel.userId.replace('#', ''));
+            const twitchUser = channels.find(u => u.name === channel.userId.replace('#', ''));
             if (!twitchUser) return;
 
             return {
