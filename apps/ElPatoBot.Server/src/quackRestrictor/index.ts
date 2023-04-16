@@ -15,35 +15,34 @@ class QuackRestrictor {
         this._userActivityMap = {};
     }
 
-    public isQuackAllowed = async (userId: string, firstWarning: () => Promise<void>) => {
-        const userActivity = this._userActivityMap[userId];
+    private createUserToChanelKey = (user:string, channel:string) => (`${user}:${channel}`);
+
+    public getWarnings = (userId: string, channel:string) => {
+        const key = this.createUserToChanelKey(userId, channel);
+        const userActivity = this._userActivityMap[key];
 
         if (!userActivity) {
-            this.updateActivity(userId);
-            return true;
+            this.updateActivity(key);
+            return 0;
         };
 
-        if (userActivity.warnings === 0) {
-            await firstWarning();
-        }
-
-        console.log(`quack not allowed for user ${userId} with ${userActivity.warnings} warnings`);
         userActivity.warnings += 1;
-        return false;
+        console.log(`quack not allowed for user ${userId} in channel ${channel} with ${userActivity.warnings} warnings`);
+        return userActivity.warnings;
     }
 
-    private updateActivity = (userId: string) => {
-        const timeoutId = setTimeout(() => this.clearActivity(userId), delayBetweenQuacks);
+    private updateActivity = (key: string) => {
+        const timeoutId = setTimeout(() => this.clearActivity(key), delayBetweenQuacks);
 
-        this._userActivityMap[userId] = {
+        this._userActivityMap[key] = {
             lastActivity: new Date(),
             timeoutId,
             warnings: 0,
         }
     }
 
-    public clearActivity = (userId:string) => {
-        delete this._userActivityMap[userId]
+    public clearActivity = (key:string) => {
+        delete this._userActivityMap[key]
     }
 }
 

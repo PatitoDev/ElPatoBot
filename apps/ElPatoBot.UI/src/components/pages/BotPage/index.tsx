@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { BaseEvent, ConnectEvent } from 'patoevents';
+import { BaseEvent, ConnectEvent } from '@elpatobot/events';
 import settings from "../../../settings";
 
 const parseWebsocketMessage = (message: MessageEvent) => {
@@ -36,7 +36,7 @@ const BotPage = () => {
             }
         }
 
-        wsClient.onclose = (e) => {
+        wsClient.onclose = () => {
             console.log('lost connection to ws server, reconnecting...');
             setWsClient(new WebSocket(settings.websocketUrl));
         }

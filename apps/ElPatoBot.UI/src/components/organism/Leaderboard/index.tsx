@@ -1,9 +1,9 @@
 import * as S from './styles';
-import { faCamera, faExclamationTriangle, faSpider, faSpinner, faUser, faVideoCamera, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
+import { faExclamationTriangle, faSpinner, faUser, faVideoCamera, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { ChannelQuacksResponse, UserQuacksResponse } from 'responses';
+import { ChannelQuacksResponse, UserQuacksResponse } from '@elpatobot/responses';
 import QuackCard from '../../molecules/QuackCard';
 import Typography from '../../atoms/Typography';
 import settings from '../../../settings';

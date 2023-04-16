@@ -1,6 +1,6 @@
 {
-  "name": "ElPatoBot",
-  "version": "0.0.0",
+  "name": "elpatobot",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -15,8 +15,7 @@
     "clean": "rimraf node_modules"
   },
   "devDependencies": {
-    "eslint-config-custom": "*",
-    "prettier": "latest"
+    "@elpatobot/eslint": "*"
   },
   "engines": {
     "node": ">=14.0.0"

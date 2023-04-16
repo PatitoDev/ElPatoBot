@@ -5,7 +5,7 @@
 
 import quackRepository, { QuackEntity } from "../repository/quackRepository";
 
-const DB_UPDATE_SYNC = 300000;
+const DB_UPDATE_SYNC = 10000;
 const MAX_TOP_ITEMS = 10;
 
 class InMemoryCache {
@@ -22,7 +22,7 @@ class InMemoryCache {
         this.topUsers = [];
         this.getTopFromDb();
         this.topHasChanged = false;
-        setInterval(this.updateDatabase, 10000)
+        setInterval(this.updateDatabase, DB_UPDATE_SYNC)
     }
 
     private getTopFromDb =  async () => {
@@ -50,7 +50,6 @@ class InMemoryCache {
     private updateDatabase = async () => {
         try {
             if (this.topHasChanged) {
-                console.log('Updated top db');
                 await quackRepository.updateTopChannelQuacks(this.topChannels
                     .sort((c) => c.quackCount)
                     .slice(0, MAX_TOP_ITEMS)
@@ -63,14 +62,12 @@ class InMemoryCache {
             }
 
             for (const key of Object.keys(this.users)){
-                console.log('Updated user db');
                 const quacks = this.users[key];
                 await quackRepository.setUserQuacks(key, quacks);
                 delete this.users[key];
             }
 
             for (const key of Object.keys(this.channels)){
-                console.log('Updated channel db');
                 const quacks = this.channels[key];
                 console.log(this.channels);
                 console.log(key, quacks);

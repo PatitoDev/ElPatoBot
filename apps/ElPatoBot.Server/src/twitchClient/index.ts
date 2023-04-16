@@ -1,111 +1,108 @@
-import { QuackEvent } from 'patoevents';
-import SECRETS from 'secrets';
-import tmi from 'tmi.js';  
-import ws from 'ws';
-import InMemoryCache from '../InMemoryCache';
+import SECRETS, { TokenCache } from '@elpatobot/secrets';
 import QuackRestrictor from '../quackRestrictor';
-import { env, settings } from '../settings';
-import twitchApi from '../twitchApi';
+import { settings } from '../settings';
+import { ChatClient } from '@twurple/chat';
+import { RefreshingAuthProvider } from '@twurple/auth';
+
+interface TwitchPrivateMessage {
+    id: string
+    userInfo: {
+        userId: string
+    }
+}
 
 class TwitchClient {
-    public channel: string;
-    private clientConnections: Array<ws.WebSocket>;
-    private twitchClient: tmi.Client;
-    private cache: InMemoryCache;
-    private quackRestrictor: QuackRestrictor;
+    private _twitchClient: ChatClient;
+    private _quackRestrictor: QuackRestrictor;
+    private _tokenCache: TokenCache;
+    private _onQuackCallback: (userId: string, channel: string) => void;
+    private _getQuackRank: () => Promise<string>;
+    private _authProvider: RefreshingAuthProvider;
 
-    constructor(channel:string, cache: InMemoryCache) {
-        this.quackRestrictor = new QuackRestrictor();
-        this.channel = channel;
-        this.clientConnections = []
-        this.cache = cache;
-        this.twitchClient = new tmi.Client({
-            options: { debug: env === 'dev' },
-            identity: {
-                username: SECRETS.twitch.username,
-                password: `oauth:${SECRETS.twitch.token}`,
-            },
-            channels: [ channel ],
-        });
-
-        this.twitchClient.connect().catch(console.error);
-
-        this.twitchClient.on('message', async (channel, tags, message, self) => {
-            if (message.toLowerCase().trim() === "!quackrank") {
-                try {
-                    const users = await twitchApi.getUserProfileById(this.cache.topUsers.map((u) => u.userId));
-                    const usersQuacks = this.cache.topUsers.map((user) => {
-                        const twitchUser = users.data.find(u => u.id === user.userId);
-                        if (!twitchUser) return;
-
-                        return {
-                            name: twitchUser.display_name,
-                            quacks: user.quackCount,
-                        }
-                    });
-
-                    let msg = 'Quack Rank:'
-                    msg = usersQuacks
-                        .filter(u => u !== undefined)
-                        .sort((a,b) => b!.quacks - a!.quacks)
-                        .slice(0, 5)
-                        .map((u) => `  🦆 ${u?.name} ha quackeado ${u?.quacks} `).join('');
-                    await this.twitchClient.say(channel, msg);
-                } catch (e) {
-                    console.log('Error when receiving quackrank command: ', e);
-                }
-                return;
-            }
-            
-            if (message.toLowerCase().trim().includes('*quack*')){
-                try {
-                    const userId = tags['user-id'];
-                    if (!userId) {
-                        console.log('user id not found in tags. Aborting...');
-                        return;
-                    }
-
-                    const allowed = await this.quackRestrictor.isQuackAllowed(userId, async () => {
-                        await this.twitchClient.say(channel, `tranquilo @${tags['username']}! estas quackeando muy rapido, limita tus quacks a un quack cada ${settings.delayBetweenUserQuacksInSeconds} segundos`);
-                    });
-
-                    if (!allowed) return;
-
-                    this.cache.addOneQuack(userId, channel);
-
-                    this.clientConnections.forEach((c) => {
-                        if (
-                            c.readyState === c.CLOSED ||
-                            c.readyState === c.CLOSING) {
-                                this.removeFromClient(c);
-                                return;
-                        }
-                        c.send(JSON.stringify({
-                            type: 'quack',
-                        } as QuackEvent))
-                    });
-                } catch (e) {
-                    console.log('Error when receiving *quack*:', e);
-                }
+    constructor(onQuack: TwitchClient['_onQuackCallback'], getQuackRank: TwitchClient['_getQuackRank']) {
+        this._getQuackRank = getQuackRank;
+        this._onQuackCallback = onQuack;
+        this._quackRestrictor = new QuackRestrictor();
+        this._tokenCache = new TokenCache(SECRETS.twitch.token, SECRETS.twitch.refreshToken);
+        this._authProvider = new RefreshingAuthProvider({
+            clientId: SECRETS.twitch.clientId,
+            clientSecret: SECRETS.twitch.extensionSecret,
+            onRefresh: (_, newToken) => {
+                this._tokenCache.writeToken({
+                    accessToken: newToken.accessToken,
+                    expiresIn: newToken.expiresIn ?? 0,
+                    obtainedAt: newToken.obtainmentTimestamp,
+                    refreshToken: newToken.refreshToken,
+                })
             }
         });
+
+        // non awaited promise
+        this._authProvider.addUserForToken({
+            expiresIn: this._tokenCache.current.expiresIn,
+            obtainmentTimestamp: this._tokenCache.current.obtainedAt,
+            refreshToken: this._tokenCache.current.refreshToken,
+            accessToken: this._tokenCache.current.accessToken,
+            scope: ['chat:read', 'chat:edit'],
+        }, ['chat']).then(() => {
+            this._twitchClient.connect();
+        });
+        this._twitchClient = new ChatClient({ authProvider: this._authProvider });
+        this._twitchClient.onAuthenticationFailure(() => {
+            console.error('unable to authenticate with twitch chat');
+        });
+        this._twitchClient.onJoinFailure((chat, reason) => {
+            console.error(`Unable to join channel:${chat} reason: ${reason}`)
+        });
+        this._twitchClient.onDisconnect((manually) => {
+            if (manually) {
+                console.log(`left channel, connections: ${this._twitchClient.currentChannels}`);
+            }
+        })
+        this._twitchClient.onMessage(this.onMessage);
+        this._twitchClient.onJoinFailure(console.error);
     }
 
-    public killTwitchConnection = async () => (
-        await this.twitchClient.disconnect()
-    );
-
-    public addToClient = (client:ws.WebSocket) => {
-        this.clientConnections.push(client);
+    public join = (channel: string) => {
+        console.log(`Attempting to join channel ${channel}`);
+        this._twitchClient.join(channel);
     }
 
-    public getConnections = () => (
-        this.clientConnections
-    )
+    private onQuackRank = async (channel: string) => {
+        this._twitchClient.say(channel, await this._getQuackRank());
+    }
 
-    public removeFromClient = (client: ws.WebSocket) => {
-        this.clientConnections = this.clientConnections
-            .filter((c) => ( c !== client ));
+    private onQuack = async (channel: string, user: string, msgData: TwitchPrivateMessage) => {
+        const userId = msgData.userInfo.userId;
+        
+        const warningCount = this._quackRestrictor.getWarnings(userId, channel);
+        if (warningCount === 1) {
+            await this._twitchClient.say(channel, `tranquilo @${user}! estas quackeando muy rapido, limita tus quacks a un quack cada ${settings.delayBetweenUserQuacksInSeconds} segundos`);
+        }
+
+        if (warningCount > 0) return;
+        this._onQuackCallback(userId, channel);
+    }
+
+    private onMessage = async (channel: string, user: string, message: string, msgData: TwitchPrivateMessage) => {
+        if (message.toLowerCase().trim() === "!quackrank") {
+            await this.onQuackRank(channel);
+        }
+
+        if (message
+                .toLowerCase()
+                .trim()
+                .replace(' ', '')
+                .includes('*quack*')){
+            await this.onQuack(channel, user, msgData);
+        }
+    }
+
+    public getConnections = () => this._twitchClient.currentChannels;
+
+    public part = (channel: string) => {
+        console.log(`Disconnecting from channel: ${channel}`);
+        this._twitchClient.part(channel);
     }
 }
 

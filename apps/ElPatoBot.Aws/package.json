@@ -1,7 +1,7 @@
 {
-  "name": "ElPatoBot.Aws",
+  "name": "@elpatobot/aws",
   "version": "1.0.0",
-  "description": "",
+  "description": "serverless deployment for elpatobot",
   "dependencies": {
     "express": "^4.17.1",
     "serverless-http": "^2.7.0"

@@ -1,11 +1,10 @@
-import SECRETS from 'secrets';
+import SECRETS from '@elpatobot/secrets';
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 
 const env = process.env['env'];
 
-export type TableKey = 
-'UserQuacks' 
+export type TableKey = 'UserQuacks'
 | 'ChannelQuacks'
 | 'TopUserQuacks'
 | 'TopChannelQuacks'
@@ -32,7 +31,7 @@ const marshallOptions = {
 
 const unmarshallOptions = {
   // Whether to return numbers as a string instead of converting them to native JavaScript numbers.
-  wrapNumbers: false, // false, by default. // TODO - check if this works for us
+  wrapNumbers: false, // false, by default.
 };
 
 const client = DynamoDBDocument.from(internalClient, { marshallOptions, unmarshallOptions })

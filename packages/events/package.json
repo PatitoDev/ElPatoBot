@@ -1,16 +1,12 @@
 {
-  "name": "patoevents",
-  "version": "0.0.1",
+  "name": "@elpatobot/events",
+  "version": "1.0.0",
   "main": "index.ts",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^7.23.0",
-    "eslint-config-next": "13.0.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-react": "7.31.8",
-    "eslint-config-turbo": "latest"
+    "@elpatobot/ts": "*"
   },
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "@elpatobot/eslint": "*"
   }
 }
