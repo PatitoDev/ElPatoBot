@@ -21,7 +21,7 @@ const BotPage = () => {
             wsClient.send(JSON.stringify({
                 type: 'connect',
                 content: {
-                    channel: userName,
+                    channel: userName.toLowerCase(),
                 }
             } as ConnectEvent));
         }
