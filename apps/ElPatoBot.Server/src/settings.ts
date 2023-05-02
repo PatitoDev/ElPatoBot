@@ -17,6 +17,6 @@ const allSettings:Record<'dev' | 'prd', Settings> = {
         corsDomain: 'https://elpatobot.com',
         delayBetweenUserQuacksInSeconds: 5 
     }
-}
+};
 
 export const settings = allSettings[env];

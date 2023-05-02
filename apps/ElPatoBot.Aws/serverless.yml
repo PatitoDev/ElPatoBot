@@ -9,6 +9,7 @@ params:
     ChannelQuacks: ${self:service}-${sls:stage}-ChannelQuacks
     TopChannelQuacks: ${self:service}-${sls:stage}-TopChannelQuacks
     TopUserQuacks: ${self:service}-${sls:stage}-TopUserQuacks
+    UserConfig: ${self:service}-${sls:stage}-UserConfig
 
 provider:
   name: aws
@@ -19,6 +20,7 @@ provider:
     CHANNEL_QUACKS: ${param:ChannelQuacks}
     TOP_USER_QUACKS: ${param:TopUserQuacks}
     TOP_CHANNEL_QUACKS: ${param:TopChannelQuacks}
+    USER_CONFIG: ${param:UserConfig}
   iam:
     role:
       statements:
@@ -33,6 +35,7 @@ provider:
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${param:UserQuacks}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${param:ChannelQuacks}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${param:UserConfig}
 
 resources:
   Resources:
@@ -80,3 +83,14 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:TopUserQuacks}
+    UserConfig:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:UserConfig}

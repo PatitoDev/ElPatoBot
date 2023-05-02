@@ -9,6 +9,9 @@ import { ChannelQuacksResponse, UserQuacksResponse } from '@elpatobot/responses'
 import InMemoryCache from './InMemoryCache';
 import twitchApi from './twitchApi';
 import { env, settings } from './settings';
+import { userRepository } from './repository/userRespository';
+import koaBody from 'koa-body';
+import { UserConfig } from '@elpatobot/entity';
 
 const cache = new InMemoryCache();
 const app = new Koa();
@@ -18,12 +21,14 @@ app.use(cors({
     origin: settings.corsDomain,
 }));
 
+app.use(koaBody({ jsonLimit: '1kb' }));
+
 const parseWebsocketMessage = (message: ws.MessageEvent) => {
     if (typeof message.data === 'string') return message.data;
     if (typeof message.data === 'object') {
         return new TextDecoder().decode(message.data as ArrayBuffer);
     }
-}
+};
 const server = http.createServer(app.callback());
 const wss = new ws.Server({ server });
 
@@ -34,31 +39,31 @@ const onQuack:TwitchClient['_onQuackCallback'] = (userId, channel) => {
         connection.send(JSON.stringify({
             type: 'quack',
             content: null
-        } satisfies QuackEvent))
+        } satisfies QuackEvent));
     }
-}
+};
 
 const getQuackRank = async ():Promise<string> => {
     const users = await twitchApi.getUserProfileById(cache.topUsers.map((u) => u.userId));
     const usersQuacks = cache.topUsers.map((user) => {
-    const twitchUser = users.find(u => u.id === user.userId);
-                if (!twitchUser) return;
+        const twitchUser = users.find(u => u.id === user.userId);
+        if (!twitchUser) return;
 
-                        return {
-                            name: twitchUser.displayName,
-                            quacks: user.quackCount,
-                        }
-                    });
+        return {
+            name: twitchUser.displayName,
+            quacks: user.quackCount,
+        };
+    });
 
-                    let msg = 'Quack Rank:'
-                    msg = usersQuacks
-                        .filter(u => u !== undefined)
-                        .sort((a,b) => b!.quacks - a!.quacks)
-                        .slice(0, 5)
-                        .map((u) => `  🦆 ${u?.name} ha quackeado ${u?.quacks} `).join('');
+    let msg = 'Quack Rank:';
+    msg = usersQuacks
+        .filter(u => u !== undefined)
+        .sort((a,b) => b!.quacks - a!.quacks)
+        .slice(0, 5)
+        .map((u) => `  🦆 ${u?.name} ha quackeado ${u?.quacks} `).join('');
     return msg;
 
-}
+};
 
 const twitchClient = new TwitchClient(onQuack, getQuackRank);
 
@@ -118,14 +123,14 @@ appRouter.get('/users/quacks', async (ctx) => {
                 name: twitchUser.displayName,
                 quacks: user.quackCount,
                 profileImg: twitchUser.profilePictureUrl,
-            } as UserQuacksResponse
+            } as UserQuacksResponse;
         });
         ctx.response.body = respBody.filter((i) => i !== undefined);
     } catch (e){
         console.log(e);
         console.log('Error from user api : ', (e as any).data);
     }
-})
+});
 
 appRouter.get('/channels/quacks', async (ctx) => {
     try {
@@ -143,13 +148,58 @@ appRouter.get('/channels/quacks', async (ctx) => {
                 quacks: channel.quackCount,
                 profileImg: twitchUser.profilePictureUrl,
                 description: twitchUser.description,
-            } as ChannelQuacksResponse
+            } as ChannelQuacksResponse;
         });
         ctx.response.body = respBody.filter((i) => i !== undefined); 
     } catch (e) {
         console.log('Error from channel api : ', e);
     }
-})
+});
+
+appRouter.get('/user/config', async (ctx) => {
+    const token = ctx.request.headers.authorization;
+    if (typeof token !== 'string') throw new Error('token not found');
+    const { login } = await twitchApi.validateToken(token);
+    const config = await userRepository.getUserConfig(login);
+    ctx.response.body = config;
+});
+
+appRouter.post('/user/config', async (ctx) => {
+    const token = ctx.request.headers.authorization;
+    if (typeof token !== 'string') throw new Error();
+    const { login } = await twitchApi.validateToken(token);
+    const body = ctx.request.body;
+    if (typeof body !== 'object' || body === null) throw new Error('missing body');
+
+    const {
+        appearOnTheRanking,
+        quackLimiterAmount,
+        quackLimiterEnabled,
+    } = (body as {
+        appearOnTheRanking: unknown,
+        quackLimiterAmount: unknown,
+        quackLimiterEnabled: unknown
+    });
+
+    if (
+        !(typeof appearOnTheRanking === 'boolean' &&
+        typeof quackLimiterAmount === 'number' &&
+        typeof quackLimiterEnabled === 'boolean')
+    ) {
+        ctx.res.statusCode = 400;
+        return;
+    }
+
+    await userRepository.updateUserConfig({
+        appearOnTheRanking,
+        quackLimiterAmount,
+        quackLimiterEnabled,
+        userId: login
+    });
+    await twitchClient.updateConfigCache(login);
+
+    ctx.res.statusCode = 200;
+});
 
 app.use(appRouter.routes());
 

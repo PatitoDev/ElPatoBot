@@ -15,7 +15,7 @@ const ClickToCopy = ({ content }:ClickToCopyProps) => {
             setIsShowing(false);
         }, 1000);
         navigator.clipboard.writeText(content);
-    }
+    };
     
     return (
         <>
@@ -25,8 +25,8 @@ const ClickToCopy = ({ content }:ClickToCopyProps) => {
                 </S.NotificationContainer>
             )}
             <S.Container
-            type="button"
-            onClick={onClick}>
+                type="button"
+                onClick={onClick}>
                 <img 
                     alt="click to copy"
                     width="30px" src="/img/copy.svg" 
@@ -36,7 +36,7 @@ const ClickToCopy = ({ content }:ClickToCopyProps) => {
                 </Typography>
             </S.Container>
         </>
-    )
-}
+    );
+};
 
 export default ClickToCopy;

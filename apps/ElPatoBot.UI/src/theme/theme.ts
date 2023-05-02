@@ -1,4 +1,4 @@
-import { DefaultTheme } from "styled-components";
+import { DefaultTheme } from 'styled-components';
 
 export const theme:DefaultTheme = {
     colors: {
@@ -7,5 +7,6 @@ export const theme:DefaultTheme = {
         orange: '#E0510C',
         black: '#222222',
         gray: '#4E4E4E',
+        yellow: '#FFCD6B'
     }
-}
+};

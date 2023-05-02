@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import Typography from "../Typography";
+import styled from 'styled-components';
+import Typography from '../Typography';
 
 const Link = styled.a`
     text-decoration: none;

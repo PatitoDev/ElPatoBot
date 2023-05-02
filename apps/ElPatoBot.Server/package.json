@@ -29,7 +29,8 @@
     "ws": "^8.11.0",
     "@elpatobot/events": "*",
     "@elpatobot/ts": "*",
-    "@elpatobot/eslint": "*"
+    "@elpatobot/eslint": "*",
+    "@elpatobot/entity": "*"
   },
   "scripts": {
     "start": "cross-env env=dev ts-node ./src/index.ts",

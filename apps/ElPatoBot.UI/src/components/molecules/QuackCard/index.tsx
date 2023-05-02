@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from '../../atoms/Link';
 import Typography from '../../atoms/Typography';
 import * as S from './styles';
@@ -49,6 +48,6 @@ const QuackCard = ({
             Quacks
         </Typography>
     </S.Card>
-)
+);
 
 export default QuackCard;

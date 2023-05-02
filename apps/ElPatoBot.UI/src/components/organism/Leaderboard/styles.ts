@@ -13,7 +13,7 @@ export const RankTypesMenu = styled.div`
     > *:not(:last-child){
         margin-right: 0.8em;
     }
-`
+`;
 
 export const MenuButton = styled.button<{isSelected: boolean}>`
 
@@ -36,4 +36,4 @@ export const MenuButton = styled.button<{isSelected: boolean}>`
     padding: 0;
     font-size: 1.2em;
     cursor: pointer;
-`
+`;

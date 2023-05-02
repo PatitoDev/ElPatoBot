@@ -32,7 +32,7 @@ const rankingTypes: Array<RankingType> = [
         icon: faVideoCamera,
         name: 'Quacks Por Canal',
     },
-]
+];
 const Leaderboard = () => {
     const [{
         channelQuacks,
@@ -83,7 +83,7 @@ const Leaderboard = () => {
                 {' '}
                 Ranking exploto! Demasiados *quack*s
             </Typography>
-        )
+        );
     }
 
     if (isLoading) {
@@ -91,7 +91,7 @@ const Leaderboard = () => {
             <Typography variant="title">
                 <FontAwesomeIcon icon={faSpinner} spin color="black" />
             </Typography>
-        )
+        );
     }
 
     return (
@@ -102,7 +102,7 @@ const Leaderboard = () => {
                         isSelected={rankType.id === selectedRankType}
                         key={rankType.id} 
                         onClick={() => {
-                            setSelectedRankType(rankType.id)
+                            setSelectedRankType(rankType.id);
                         }}>
                         <FontAwesomeIcon icon={rankType.icon} />
                         {rankType.name}
@@ -111,34 +111,34 @@ const Leaderboard = () => {
             </S.RankTypesMenu>
 
             {userQuacks && selectedRankType === 0 && userQuacks
-            .sort((a, b) => b.quacks - a.quacks)
-            .slice(0, 9)
-            .map((user, index) => (
-                <QuackCard
-                    key={user.name}
-                    name={user.name}
-                    profileUrl={user.profileImg}
-                    quacks={user.quacks}
-                    rankPosition={index + 1}
-                />
-            ))}
+                .sort((a, b) => b.quacks - a.quacks)
+                .slice(0, 9)
+                .map((user, index) => (
+                    <QuackCard
+                        key={user.name}
+                        name={user.name}
+                        profileUrl={user.profileImg}
+                        quacks={user.quacks}
+                        rankPosition={index + 1}
+                    />
+                ))}
         
             {channelQuacks && selectedRankType === 1 && channelQuacks
-            .sort((a, b) => b.quacks - a.quacks)
-            .slice(0, 9)
-            .map((channel, index) => (
-                <QuackCard
-                    key={channel.name}
-                    name={channel.name}
-                    profileUrl={channel.profileImg}
-                    quacks={channel.quacks}
-                    rankPosition={index + 1}
-                    description={channel.description}
-                    url={`https://twitch.tv/${channel.name}`}
-                />
-            ))}
+                .sort((a, b) => b.quacks - a.quacks)
+                .slice(0, 9)
+                .map((channel, index) => (
+                    <QuackCard
+                        key={channel.name}
+                        name={channel.name}
+                        profileUrl={channel.profileImg}
+                        quacks={channel.quacks}
+                        rankPosition={index + 1}
+                        description={channel.description}
+                        url={`https://twitch.tv/${channel.name}`}
+                    />
+                ))}
         </S.Container>
-    )
-}
+    );
+};
 
 export default Leaderboard;

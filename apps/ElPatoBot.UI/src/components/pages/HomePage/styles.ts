@@ -1,4 +1,4 @@
-import Styled from 'styled-components';
+import Styled, { css } from 'styled-components';
 
 export const Page = Styled.div`
     display: flex;
@@ -6,7 +6,7 @@ export const Page = Styled.div`
     height: 100vh;
     overflow: auto;
     align-items: baseline;
-`
+`;
 
 export const Card = Styled.div`
     max-width: 800px;
@@ -32,4 +32,37 @@ export const Card = Styled.div`
         font-size: 0.7rem;
         margin: 5px;
     }
+`;
+
+const sharedButtonStyles = css`
+    margin-top: 2em;
+    outline: solid 2px #f8d2ba;
+    color: black;
+    background: linear-gradient(89.76deg, #FFE5A0 0.14%, #FFC5A5 104.7%);
+    padding: 0.7em 1em;
+    border-radius: 3px;
+    font-size: 1.3em;
+    :hover {
+        box-shadow: 0 0 4px 0px #8f7529;
+    }
+`;
+
+export const Anchor = Styled.a`
+    display: inline-block;
+    text-decoration: none;
+    ${sharedButtonStyles}
+`;
+
+export const Button = Styled.button`
+    margin-bottom: 2em;
+    cursor: pointer;
+    border: none;
+    ${sharedButtonStyles}
+`;
+
+export const CenterContainer = Styled.div`
+    text-align: center;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
 `;

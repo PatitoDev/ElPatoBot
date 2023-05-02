@@ -1,5 +1,5 @@
-import Styled, { keyframes } from "styled-components";
-import Typography from "../../atoms/Typography";
+import Styled, { keyframes } from 'styled-components';
+import Typography from '../../atoms/Typography';
 
 export const Container = Styled.button`
     cursor: pointer;
@@ -26,7 +26,7 @@ const slideIn = keyframes`
   to {
     transform: translateX(0);
   }
-`
+`;
 export const NotificationContainer = Styled.div`
     position: absolute;
     top: 15px;
