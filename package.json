@@ -14,9 +14,7 @@
     "start:ui": "turbo run start:ui",
     "clean": "rimraf node_modules"
   },
-  "devDependencies": {
-    "@elpatobot/eslint": "*"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=14.0.0"
   },

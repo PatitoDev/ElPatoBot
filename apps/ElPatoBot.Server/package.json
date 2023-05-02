@@ -29,7 +29,6 @@
     "ws": "^8.11.0",
     "@elpatobot/events": "*",
     "@elpatobot/ts": "*",
-    "@elpatobot/eslint": "*",
     "@elpatobot/entity": "*"
   },
   "scripts": {
