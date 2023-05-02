@@ -15,8 +15,8 @@ const allSettings:Record<'prd' | 'dev', {
         loginUrl: 'https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=u4i00xkzdt2e5ti2c10p396uqlkkvw&redirect_uri=http://localhost:3000&scope=&state=c3ab8aa609ea11e793ae92361f002671'
     },
     prd: {
-        serverUrl: 'https://api.elpatobot.com/',
-        websocketUrl: 'wss://api.elpatobot.com/',
+        serverUrl: 'https://api.niv3kelpato.com/',
+        websocketUrl: 'wss://api.niv3kelpato.com/',
         loginUrl: 'https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=u4i00xkzdt2e5ti2c10p396uqlkkvw&redirect_uri=https://elpatobot.com&scope=&state=c3ab8aa609ea11e793ae92361f002671',
     }
 };
