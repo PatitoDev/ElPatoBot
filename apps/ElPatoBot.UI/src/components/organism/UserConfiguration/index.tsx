@@ -92,7 +92,7 @@ const UserConfiguration = ({ token }: UserConfigurationProps) => {
                         <input value={config.quackLimiterAmount} type="number" onChange={(e) => {
                             onQuackLimiterAmount(e.target.value);
                         }} />
-                    segundos 
+                    segundos por usuario
 
                     </label>
                 </Typography>
