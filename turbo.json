@@ -5,8 +5,10 @@
       "cache": false
     },
     "start:ui": {
+      "cache": false
     },
     "start:prd": {
+      "cache": false
     },
     "start": {
       "cache": false
@@ -16,8 +18,10 @@
       "outputs": ["dist/**", ".next/**", "build/**"]
     },
     "deploy:dev": {
+      "cache": false
     },
     "deploy:prd": {
+      "cache": false
     },
     "lint": {
       "outputs": []
@@ -26,6 +30,7 @@
       "cache": false
     },
     "clean": {
+      "cache": false
     }
   }
 }
