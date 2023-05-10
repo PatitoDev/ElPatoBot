@@ -42,7 +42,7 @@ const QuackCard = ({
                 </Typography>   
             )}
         </S.TitleContainer>
-        <Typography color="white"variant='action'>
+        <Typography noWrap color="white"variant='action'>
             {quacks}
             {' '}
             Quacks
