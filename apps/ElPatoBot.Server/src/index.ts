@@ -93,9 +93,12 @@ wss.on('connection', (socket) => {
             const sockets = connections[key];
             connections[key] = sockets.filter(soc => soc !== socket);
             if (connections[key].length === 0) {
-                console.log(`All connections for channel ${key} disconnected`);
-                twitchClient.part(key);
-                delete connections[key];
+                setTimeout(() => {
+                    if (connections[key]?.length !== 0) return;
+                    delete connections[key];
+                    console.log(`All connections for channel ${key} disconnected`);
+                    twitchClient.part(key);
+                }, 60 * 1000);
             }
         }
     });
