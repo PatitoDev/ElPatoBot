@@ -13,8 +13,8 @@ const allSettings:Record<'dev' | 'prd', Settings> = {
         delayBetweenUserQuacksInSeconds: 2, 
     },
     prd: {
-        port: 8084,
-        corsDomain: 'https://api.niv3kelpato.com',
+        port: 8080,
+        corsDomain: 'https://niv3kelpato.com',
         delayBetweenUserQuacksInSeconds: 5 
     }
 };
