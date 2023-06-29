@@ -73,11 +73,15 @@ class TwitchClient {
     };
 
     public join = async (channel: string) => {
-        console.log(`Attempting to join channel ${channel}`);
-        this._twitchClient.join(channel);
-        if (this._configCache[channel]) return;
-        const config = await userRepository.getUserConfig(channel);
-        this._configCache[channel] = config;
+        try {
+            console.log(`Attempting to join channel ${channel}`);
+            await this._twitchClient.join(channel);
+            if (this._configCache[channel]) return;
+            const config = await userRepository.getUserConfig(channel);
+            this._configCache[channel] = config;
+        } catch {
+            console.log(`Unable to connect to ${channel}, could be incorrect name`);
+        }
     };
 
     private onQuackRank = async (channel: string) => {
