@@ -14,7 +14,7 @@ const allSettings:Record<'dev' | 'prd', Settings> = {
     },
     prd: {
         port: 8080,
-        corsDomain: 'https://niv3kelpato.com',
+        corsDomain: 'https://elpatobot.com',
         delayBetweenUserQuacksInSeconds: 5 
     }
 };
